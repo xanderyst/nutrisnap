@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -7,9 +9,45 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { useState, useEffect } from "react";
 
-export default function AnalysisResult({ result, onAddDish }) {
+export default function AnalysisResult({ result, onAddDish, loading }) {
+  // Sample loading component
+  const [isLogged, setIsLogged] = useState(false);
+  useEffect(() => {
+    console.log("use effect is called");
+    setIsLogged(false);
+  }, [result]);
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Nutrition</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col space-y-3">
+              <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const onLogMeal = () => {
+    onAddDish();
+    setIsLogged(true);
+  };
+
   const totalNutrition = result.ingredients.reduce(
     (acc, ingredient) => ({
       calories: acc.calories + ingredient.nutrition.calories,
@@ -23,8 +61,8 @@ export default function AnalysisResult({ result, onAddDish }) {
   return (
     <>
       <h2 className="text-2xl font-bold mb-4">Dish Name: {result.dishName}</h2>
-      <div className="grid gap-4 mb-6">
-        <Card>
+      <div>
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle>Total Nutrition</CardTitle>
           </CardHeader>
@@ -45,10 +83,13 @@ export default function AnalysisResult({ result, onAddDish }) {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="mb-6">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Ingredients</CardTitle>
-            <Button onClick={onAddDish}>Click to Log Meal</Button>
+            {!isLogged && (
+              <Button onClick={onLogMeal}>Click to Log Meal</Button>
+            )}
+            {isLogged && <Label>Meal Logged!</Label>}
           </CardHeader>
           <CardContent>
             <Table>

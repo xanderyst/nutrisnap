@@ -104,7 +104,11 @@ export default function AIFoodAnalyzer() {
         isAnalyzing={isAnalyzing}
       />
       {analysisResult && (
-        <AnalysisResult result={analysisResult} onAddDish={addDish} />
+        <AnalysisResult
+          loading={isAnalyzing}
+          result={analysisResult}
+          onAddDish={addDish}
+        />
       )}
       <AddedFoodsList foods={addedFoods} onDelete={deleteFood} />
       <TotalDailyNutrition foods={addedFoods} />
