@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import imageCompression from "browser-image-compression";
 import ImageUploader from "./ImageUploader";
 import AnalysisResult from "./AnalysisResult";
 import AddedFoodsList from "./AddedFoodsList";
@@ -17,14 +18,37 @@ export default function AIFoodAnalyzer() {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [addedFoods, setAddedFoods] = useState([]);
 
-  const handleImageUpload = (file) => {
-    // setImage(file);
+  // Compress the image to 2MB if it exceeds 2MB
+  const handleImageUpload = async (file) => {
+    let compressedFile = file;
+
+    // If the image size exceeds 2MB, compress it
+    if (file.size > 2 * 1024 * 1024) {
+      // 2MB = 2 * 1024 * 1024 bytes
+      const options = {
+        maxSizeMB: 2, // Set the maximum file size to 2MB
+        useWebWorker: true, // Use Web Worker for better performance
+      };
+      try {
+        compressedFile = await imageCompression(file, options);
+        console.log("Original file size:", file.size / 1024 / 1024, "MB");
+        console.log(
+          "Compressed file size:",
+          compressedFile.size / 1024 / 1024,
+          "MB"
+        );
+      } catch (error) {
+        console.error("Error compressing the image:", error);
+      }
+    }
+
+    // Convert the compressed image to a base64 string and set the preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
       setImage(reader.result);
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(compressedFile);
   };
 
   const analyzeImage = async () => {
@@ -61,9 +85,6 @@ export default function AIFoodAnalyzer() {
       };
 
       setAddedFoods((prevFoods) => [...prevFoods, newFood]);
-      // setAnalysisResult(null);
-      // setImage(null);
-      // setImagePreview(null);
     }
   };
 
