@@ -1,0 +1,38 @@
+{
+  "name": "nutrisnap",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^0.0.63",
+    "@radix-ui/react-collapsible": "^1.1.1",
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "ai": "^3.4.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.445.0",
+    "next": "14.2.13",
+    "openai": "^4.65.0",
+    "openai-edge": "^1.2.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "shadcn-ui": "^0.9.1",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.10",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.13",
+    "eslint-config-prettier": "^9.1.0",
+    "postcss": "^8",
+    "prettier": "^3.3.3",
+    "tailwindcss": "^3.4.1"
+  }
+}
