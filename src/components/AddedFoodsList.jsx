@@ -34,7 +34,7 @@ export default function AddedFoodsList({ foods, onDelete }) {
           <TableHeader>
             <TableRow>
               <TableHead>Dish Name</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>Amount</TableHead>
               <TableHead className="text-right">Calories</TableHead>
               <TableHead className="text-right">Protein</TableHead>
               <TableHead className="text-right">Carbs</TableHead>

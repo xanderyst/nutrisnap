@@ -22,9 +22,7 @@ export default function AnalysisResult({ result, onAddDish }) {
 
   return (
     <>
-      <h2 className="text-xl font-bold mb-4">
-        {result.dishName} - Nutrition Breakdown
-      </h2>
+      <h2 className="text-2xl font-bold mb-4">Dish Name: {result.dishName}</h2>
       <div className="grid gap-4 mb-6">
         <Card>
           <CardHeader>
@@ -48,8 +46,9 @@ export default function AnalysisResult({ result, onAddDish }) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Ingredients</CardTitle>
+            <Button onClick={onAddDish}>Click to Log Meal</Button>
           </CardHeader>
           <CardContent>
             <Table>
@@ -87,9 +86,6 @@ export default function AnalysisResult({ result, onAddDish }) {
           </CardContent>
         </Card>
       </div>
-      <Button onClick={onAddDish} className="w-full mb-6">
-        Log Meal
-      </Button>
     </>
   );
 }

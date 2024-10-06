@@ -32,8 +32,8 @@ export default function AIFoodAnalyzer() {
 
     setIsAnalyzing(true);
     try {
-      const result = await simulateOpenAIAnalysis(image);
-      //const result = await sendToAnalyze(image);
+      // const result = await simulateOpenAIAnalysis(image);
+      const result = await sendToAnalyze(image);
       console.log("result", result);
       setAnalysisResult(result);
     } catch (error) {
@@ -61,9 +61,9 @@ export default function AIFoodAnalyzer() {
       };
 
       setAddedFoods((prevFoods) => [...prevFoods, newFood]);
-      setAnalysisResult(null);
-      setImage(null);
-      setImagePreview(null);
+      // setAnalysisResult(null);
+      // setImage(null);
+      // setImagePreview(null);
     }
   };
 

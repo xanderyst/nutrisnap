@@ -35,7 +35,7 @@ export default function ImageUploader({
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="w-full max-w-xs"
+              className="w-full max-w-xs cursor-pointer"
             />
             <Button onClick={onAnalyze} disabled={!imagePreview || isAnalyzing}>
               {isAnalyzing ? (
