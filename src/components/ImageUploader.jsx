@@ -33,7 +33,7 @@ export default function ImageUploader({
           <div className="flex items-center gap-4">
             <Input
               type="file"
-              accept="image/*"
+              accept="image/*;capture=camera" // This enables camera capture
               onChange={handleImageUpload}
               className="w-full max-w-xs cursor-pointer"
             />
