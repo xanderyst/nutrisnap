@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { dailyGoals as initialDailyGoals } from "@/lib/constants";
 import { useAuth } from "@clerk/nextjs";
+import { Skeleton } from "@/components/ui/skeleton"; // Import the Skeleton component
 
-export default function TotalDailyNutrition({ foods }) {
+export default function TotalDailyNutrition({ foods, disableEdit }) {
   const [isEditing, setIsEditing] = useState(false);
   const [dailyGoals, setDailyGoals] = useState(initialDailyGoals);
   const [isLoading, setIsLoading] = useState(true);
@@ -97,8 +98,31 @@ export default function TotalDailyNutrition({ foods }) {
     setDailyGoals(initialDailyGoals); // Reset to initial values
   };
 
+  const SkeletonLoader = () => (
+    <div className="space-y-4">
+      {[...Array(4)].map((_, index) => (
+        <div key={index}>
+          <div className="flex justify-between mb-1">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <Skeleton className="h-2 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+
   if (isLoading) {
-    return <div>Loading...</div>; // You might want to use a skeleton loader here
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Total Daily Nutrition</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SkeletonLoader />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -121,7 +145,9 @@ export default function TotalDailyNutrition({ foods }) {
                 </Button>
               </>
             ) : (
-              <Button onClick={handleEdit}>Edit Daily Goals</Button>
+              !disableEdit && (
+                <Button onClick={handleEdit}>Edit Daily Goals</Button>
+              )
             )}
           </div>
         )}

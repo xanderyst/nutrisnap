@@ -22,6 +22,7 @@ export default function AddedFoodsList({
   foods,
   onDelete,
   deletingMealId,
+  disableDelete,
   isLoading,
 }) {
   const [expandedFoodId, setExpandedFoodId] = useState(null);
@@ -136,18 +137,20 @@ export default function AddedFoodsList({
                       <CollapsibleTrigger asChild>
                         <TableCell>
                           <div className="flex justify-end items-center space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => onDelete(food.id)}
-                              disabled={deletingMealId === food.id}
-                            >
-                              {deletingMealId === food.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </Button>
+                            {!disableDelete && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => onDelete(food.id)}
+                                disabled={deletingMealId === food.id}
+                              >
+                                {deletingMealId === food.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
                             {expandedFoodId === food.id ? (
                               <ChevronUp className="h-4 w-4" />
                             ) : (

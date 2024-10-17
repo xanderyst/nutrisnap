@@ -6,12 +6,9 @@ import ImageUploader from "./ImageUploader";
 import AnalysisResult from "./AnalysisResult";
 import AddedFoodsList from "./AddedFoodsList";
 import TotalDailyNutrition from "./TotalDailyNutrition";
-import LoginButton from "./LoginButton";
-import {
-  simulateOpenAIAnalysis,
-  sendToAnalyze,
-} from "@/lib/simulateOpenAIAnalysis";
+import { sendToAnalyze } from "@/lib/simulateOpenAIAnalysis";
 import { useAuth } from "@clerk/nextjs";
+import { addMeal, deleteMeal, fetchMealsOnDate } from "@/lib/api";
 
 export default function AIFoodAnalyzer() {
   const [image, setImage] = useState(null);
@@ -86,29 +83,15 @@ export default function AIFoodAnalyzer() {
       );
 
       try {
-        const response = await fetch("/api/meals", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            dishName: analysisResult.dishName,
-            ingredients: analysisResult.ingredients,
-            totalNutrition: totalNutrition,
-            date: new Date().toISOString().split("T")[0],
-          }),
+        const { meal } = await addMeal({
+          dishName: analysisResult.dishName,
+          ingredients: analysisResult.ingredients,
+          totalNutrition: totalNutrition,
+          date: new Date().toISOString().split("T")[0],
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to log meal");
-        }
-
-        const data = await response.json();
-        const { meal } = data;
-        console.log("Meal logged successfully:", data);
-
         const newFood = {
-          id: meal._id,
+          id: meal.id,
           dishName: meal.dishName,
           ingredients: meal.ingredients,
           totalNutrition: meal.totalNutrition,
@@ -117,26 +100,19 @@ export default function AIFoodAnalyzer() {
         setAddedFoods((prevFoods) => [...prevFoods, newFood]);
       } catch (error) {
         console.error("Error logging meal:", error);
-        throw error; // Re-throw the error to be caught in AnalysisResult
+        throw error;
       }
     }
   };
 
   const deleteFood = async (foodId) => {
-    console.log("foodId", foodId);
     if (isSignedIn && userId) {
       setDeletingMealId(foodId);
       try {
-        const response = await fetch(`/api/meals/${foodId}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          setAddedFoods((prevFoods) =>
-            prevFoods.filter((food) => food.id !== foodId)
-          );
-        } else {
-          console.error("Failed to delete meal from the database");
-        }
+        await deleteMeal(foodId);
+        setAddedFoods((prevFoods) =>
+          prevFoods.filter((food) => food.id !== foodId)
+        );
       } catch (error) {
         console.error("Error deleting meal:", error);
       } finally {
@@ -150,46 +126,37 @@ export default function AIFoodAnalyzer() {
   };
 
   useEffect(() => {
-    const fetchTodaysMeals = async () => {
+    const loadTodaysMeals = async () => {
       if (isSignedIn && userId) {
         try {
-          const response = await fetch(
-            `/api/meals?date=${new Date().toISOString().split("T")[0]}`
+          const meals = await fetchMealsOnDate(
+            new Date().toISOString().split("T")[0]
           );
-          if (response.ok) {
-            const meals = await response.json();
-            setAddedFoods(
-              meals.map((meal) => ({
-                id: meal._id,
-                dishName: meal.dishName,
-                ingredients: meal.ingredients,
-                totalNutrition: meal.totalNutrition,
-              }))
-            );
-          } else {
-            setAddedFoods([]); // Set to empty array if request fails
-          }
+          setAddedFoods(
+            meals.map((meal) => ({
+              id: meal.id,
+              dishName: meal.dishName,
+              ingredients: meal.ingredients,
+              totalNutrition: meal.totalNutrition,
+            }))
+          );
         } catch (error) {
           console.error("Error fetching today's meals:", error);
-          setAddedFoods([]); // Set to empty array if request fails
+          setAddedFoods([]);
         } finally {
           setIsLoadingFoods(false);
         }
       } else {
-        setAddedFoods([]); // Set to empty array if user is not signed in
+        setAddedFoods([]);
         setIsLoadingFoods(false);
       }
     };
 
-    fetchTodaysMeals();
+    loadTodaysMeals();
   }, [isSignedIn, userId]);
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">NutriSnap</h1>
-        <LoginButton />
-      </div>
       <ImageUploader
         imagePreview={imagePreview}
         onImageUpload={handleImageUpload}
