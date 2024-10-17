@@ -14,15 +14,73 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Loader2 } from "lucide-react";
 import IngredientsList from "./IngredientsList";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function AddedFoodsList({ foods, onDelete }) {
+export default function AddedFoodsList({
+  foods,
+  onDelete,
+  deletingMealId,
+  isLoading,
+}) {
   const [expandedFoodId, setExpandedFoodId] = useState(null);
 
   const toggleFoodExpansion = (foodId) => {
     setExpandedFoodId((prevId) => (prevId === foodId ? null : foodId));
   };
+
+  if (isLoading || foods === null) {
+    return (
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Food Log</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Dish Name</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead className="text-right">Calories</TableHead>
+                <TableHead className="text-right">Protein</TableHead>
+                <TableHead className="text-right">Carbs</TableHead>
+                <TableHead className="text-right">Fat</TableHead>
+                <TableHead className="w-[100px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(3)].map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[150px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[50px]" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Skeleton className="h-4 w-[50px] ml-auto" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Skeleton className="h-4 w-[50px] ml-auto" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Skeleton className="h-4 w-[50px] ml-auto" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Skeleton className="h-4 w-[50px] ml-auto" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-8 rounded-full ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="mb-6">
@@ -43,7 +101,7 @@ export default function AddedFoodsList({ foods, onDelete }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {foods.length === 0 ? (
+            {foods.length === 0 && !isLoading ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-4">
                   No foods have been added yet.
@@ -81,13 +139,14 @@ export default function AddedFoodsList({ foods, onDelete }) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDelete(food.id);
-                              }}
-                              aria-label={`Delete ${food.dishName}`}
+                              onClick={() => onDelete(food.id)}
+                              disabled={deletingMealId === food.id}
                             >
-                              <Trash2 className="h-4 w-4" />
+                              {deletingMealId === food.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
                             </Button>
                             {expandedFoodId === food.id ? (
                               <ChevronUp className="h-4 w-4" />

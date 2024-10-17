@@ -13,13 +13,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { Loader2 } from "lucide-react";
 
 export default function AnalysisResult({ result, onAddDish, loading }) {
-  // Sample loading component
   const [isLogged, setIsLogged] = useState(false);
+  const [isLogging, setIsLogging] = useState(false);
+  const { isSignedIn } = useAuth();
+
   useEffect(() => {
-    console.log("use effect is called");
     setIsLogged(false);
+    setIsLogging(false);
   }, [result]);
 
   if (loading) {
@@ -43,9 +47,22 @@ export default function AnalysisResult({ result, onAddDish, loading }) {
     );
   }
 
-  const onLogMeal = () => {
-    onAddDish();
-    setIsLogged(true);
+  const handleLogMeal = async () => {
+    if (!isSignedIn) {
+      alert("Please sign in to log your meal.");
+      return;
+    }
+
+    setIsLogging(true);
+    try {
+      await onAddDish();
+      setIsLogged(true);
+    } catch (error) {
+      console.error("Error logging meal:", error);
+      alert("Failed to log meal. Please try again.");
+    } finally {
+      setIsLogging(false);
+    }
   };
 
   const totalNutrition = result.ingredients.reduce(
@@ -87,7 +104,21 @@ export default function AnalysisResult({ result, onAddDish, loading }) {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Ingredients</CardTitle>
             {!isLogged && (
-              <Button onClick={onLogMeal}>Click to Log Meal</Button>
+              <Button
+                onClick={handleLogMeal}
+                disabled={!isSignedIn || isLogging}
+              >
+                {isLogging ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging...
+                  </>
+                ) : isSignedIn ? (
+                  "Click to Log Meal"
+                ) : (
+                  "Sign in to Log Meal"
+                )}
+              </Button>
             )}
             {isLogged && <Label>Meal Logged!</Label>}
           </CardHeader>
